@@ -1,15 +1,12 @@
-class Hangman
+require 'yaml'
 
+class Hangman
   def initialize(dictionary_name)
-    if File.exist?(dictionary_name)
-      contents = File.read(dictionary_name)
-      @dictionary = contents.split("\n")
-      # for now we only want words between a length
-      # of 5 and 12.
-      @dictionary.filter! { |word| word.length > 4 && word.length < 13 }
+    if load_game?
+      load_game
+    else
+      start_new_game(dictionary_name)
     end
-    @guesses = []
-    @lives = 6
     puts "Let's Play Hangman!"
     play
   end
@@ -18,6 +15,8 @@ class Hangman
     choose_word
     until game_over? || game_won?
       print_game
+      puts 'Do you want to save? (type \'y\' if you want to)'
+      save_file if gets.chomp.downcase == 'y'
       guess = prompt_guess
       check_guess(guess)
     end
@@ -69,6 +68,44 @@ class Hangman
 
   def show_loss_screen
     puts 'GAME OVER! Sorry, you ran out of lives'
+  end
+
+  def save_game
+    game_state = { word: @word, guesses: @guesses, lives: @lives, revealed_word: @revealed_word }
+    file = File.open(@save_file, 'w+')
+    YAML.dump(game_state, file)
+  end
+
+  def load_game?
+    puts 'Would you like to load game, or start a new game?'
+    input = ''
+    until %w[L N Q].include?(input)
+      puts 'L for load, Q to close, anything else to start'
+      input = gets.chomp.upcase
+    end
+    exit if input == Q
+    input == 'L'
+  end
+
+  def load_game
+    file = File.open(@save_file, 'r')
+    game_state = YAML.safe_load(file)
+    @word = game_state[:word]
+    @guesses = game_state[:guesses]
+    @lives = game_state[:lives]
+    @revealed_word = game_state[:revealed_word]
+  end
+
+  def start_new_game(dictionary_name)
+    if File.exist?(dictionary_name)
+      contents = File.read(dictionary_name)
+      @dictionary = contents.split("\n")
+      # for now we only want words between a length
+      # of 5 and 12.
+      @dictionary.filter! { |word| word.length > 4 && word.length < 13 }
+    end
+    @guesses = []
+    @lives = 6
   end
 end
 
