@@ -30,7 +30,6 @@ class Hangman
   end
 
   def print_game
-    #TODO, show previous guesses, revealed word, remaining wrong guesses
     puts "Remaining Lives: #{@lives}"
     puts "Current word: #{@revealed_word}"
     puts "Previous Guesses: #{@guesses}"
@@ -38,11 +37,13 @@ class Hangman
 
   def prompt_guess
     guess = ''
+    puts 'Enter a letter to guess'
     until guess.length == 1 && guess.match?(/[a-z]/) && !@guesses.include?(guess)
-      puts 'Enter a letter to guess (that hasn\'t already been guessed.)'
+      puts 'make sure it hasn\'t already been guessed,and that it\'s a valid character between a and z'
       guess = gets.chomp.downcase
     end
-    @guesses.push(guess)
+    puts "#{guess} is present in the word!"
+    @guesses.push(guess).sort!
     guess
   end
 
