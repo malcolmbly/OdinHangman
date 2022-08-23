@@ -21,8 +21,8 @@ class Hangman
   def play
     until game_over? || game_won?
       print_game
-      puts 'Do you want to save? (type \'y\' if you want to)'
-      save_game if gets.chomp.downcase == 'y'
+      puts 'Do you want to save and exit? (type \'y\' if you want to)'
+      save_game_and_exit if gets.chomp.downcase == 'y'
       guess = prompt_guess
       check_guess(guess)
     end
@@ -76,10 +76,11 @@ class Hangman
     puts 'GAME OVER! Sorry, you ran out of lives'
   end
 
-  def save_game
+  def save_game_and_exit
     game_state = { word: @word, guesses: @guesses, lives: @lives, revealed_word: @revealed_word }
     file = File.open(self.class.save_file_name, 'w+')
     YAML.dump(game_state, file)
+    exit
   end
 
   def load_game?

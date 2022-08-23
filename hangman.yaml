@@ -1,9 +1,7 @@
 ---
-:word: apollo
+:word: springs
 :guesses:
 - e
-- l
-- m
-- "y"
-:lives: 3
-:revealed_word: ___ll_
+- "n"
+:lives: 5
+:revealed_word: ____n__
