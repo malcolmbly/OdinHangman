@@ -1,9 +1,4 @@
-
 class Hangman
-  @dictionary = []
-  @word = nil
-  @revealed_word = nil
-  @guesses = []
 
   def initialize(dictionary_name)
     if File.exist?(dictionary_name)
@@ -13,28 +8,32 @@ class Hangman
       # of 5 and 12.
       @dictionary.filter! { |word| word.length > 4 && word.length < 13 }
     end
-
+    @guesses = []
+    @lives = 6
     puts "Let's Play Hangman!"
     play
   end
 
   def play
     choose_word
-    until game_over?
+    until game_over? || game_won?
       print_game
       guess = prompt_guess
       check_guess(guess)
     end
+    game_won? ? show_win_screen : show_loss_screen
   end
 
   def choose_word
     @word = @dictionary.sample
-    @revealed_word = @word.map { |letter| '_'}
+    @revealed_word = '_' * @word.length
   end
 
   def print_game
-    #TODO
-    ''
+    #TODO, show previous guesses, revealed word, remaining wrong guesses
+    puts "Remaining Lives: #{@lives}"
+    puts "Current word: #{@revealed_word}"
+    puts "Previous Guesses: #{@guesses}"
   end
 
   def prompt_guess
@@ -43,12 +42,32 @@ class Hangman
       puts 'Enter a letter to guess (that hasn\'t already been guessed.)'
       guess = gets.chomp.downcase
     end
-    @guesses = @guesses.push(guess)
+    @guesses.push(guess)
     guess
   end
 
   def check_guess(guess)
-    word.each_with_index { |letter, idx| @revealed_word[idx] = letter if letter == guess} if word.include?(guess)
+    if @word.include?(guess)
+      @word.each_char.each_with_index { |letter, idx| @revealed_word[idx] = letter if letter == guess }
+    else
+      @lives -= 1
+    end
+  end
+
+  def game_over?
+    @lives.zero?
+  end
+
+  def game_won?
+    @revealed_word == @word
+  end
+
+  def show_win_screen
+    puts 'YOU WIN! Great job!'
+  end
+
+  def show_loss_screen
+    puts 'GAME OVER! Sorry, you ran out of lives'
   end
 end
 
